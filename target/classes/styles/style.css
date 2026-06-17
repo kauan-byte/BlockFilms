@@ -1,0 +1,128 @@
+/* Definição de cores globais do estilo Netflix */
+.root {
+    -fx-background-color: #141414; /* Preto de fundo da Netflix */
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Estilo dos Labels (Textos comuns) */
+.label {
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Títulos grandes */
+.titulo-logo {
+    -fx-text-fill: #E50914; /* Vermelho Netflix */
+    -fx-font-weight: bold;
+    -fx-font-size: 28px;
+}
+
+/* Campos de entrada de texto comuns (User, Senha) */
+.text-field, .password-field {
+    -fx-background-color: #333333;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-prompt-text-fill: #8C8C8C;
+}
+
+/* Caixa de texto da Sinopse (Estilizada para não herdar o fundo branco do JavaFX) */
+.text-area {
+    -fx-text-fill: #FFFFFF !important;
+}
+
+.text-area .content {
+    -fx-background-color: #333333 !important;
+    -fx-background-radius: 4px;
+}
+
+/* Efeito de foco nos campos de texto e sinopse */
+.text-field:focused, .password-field:focused, .text-area:focused, .text-area:focused .content {
+    -fx-border-color: #E50914;
+    -fx-background-color: #454545 !important;
+}
+
+/* Botão Principal (Vermelho Netflix) */
+.button-primary {
+    -fx-background-color: #E50914;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.button-primary:hover {
+    -fx-background-color: #B81D24; /* Vermelho um pouco mais escuro no hover */
+}
+
+/* Botão Secundário / Links (Texto clicável) */
+.button-hyperlink {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8C8C8C;
+    -fx-cursor: hand;
+    -fx-underline: false;
+}
+
+.button-hyperlink:hover {
+    -fx-text-fill: #FFFFFF;
+    -fx-underline: true;
+}
+
+/* ComboBox (Campo de Seleção principal) */
+.combo-box {
+    -fx-background-color: #333333;
+    -fx-text-fill: #FFFFFF !important;
+    -fx-background-radius: 4px;
+}
+
+.combo-box .label {
+    -fx-text-fill: #FFFFFF !important;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #FFFFFF !important;
+}
+
+/* Menu que cai/abre (Dropdown) dos ComboBoxes */
+.combo-box-popup .list-view {
+    -fx-background-color: #333333; /* Fundo cinza escuro para o menu */
+    -fx-background-radius: 4px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-text-fill: #FFFFFF !important; /* Texto branco nas opções */
+    -fx-background-color: #333333;
+}
+
+/* Efeito de passar o mouse por cima das opções do menu */
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #E50914 !important; /* Vermelho Netflix no hover */
+    -fx-text-fill: #FFFFFF !important;
+}
+
+/* Customização básica para a tabela de filmes */
+.table-view {
+    -fx-base: #141414;
+    -fx-control-inner-background: #333333;
+    -fx-background-color: #141414;
+    -fx-table-cell-border-color: #454545;
+}
+.table-view .column-header {
+    -fx-background-color: #E50914;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+.table-view .table-cell {
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Ajuste de padding e tamanho das linhas da tabela para suportar imagens */
+.table-view .table-row-cell {
+    -fx-cell-size: 100px; /* Aumenta a altura para a miniatura respirar */
+}
+.table-view .table-cell {
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 10px;
+}

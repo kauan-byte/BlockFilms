@@ -1,0 +1,13 @@
+br\com\blockfilmes\controller\CadastroUsuarioController.class
+br\com\blockfilmes\util\Navegacao.class
+br\com\blockfilmes\blockfilmes\BlockFilmes.class
+br\com\blockfilmes\util\SessaoUsuario.class
+br\com\blockfilmes\controller\EditarUsuarioController.class
+br\com\blockfilmes\service\Back4AppService.class
+br\com\blockfilmes\model\Usuario.class
+br\com\blockfilmes\controller\CadastroFilmeController.class
+br\com\blockfilmes\controller\CatalogoFilmesController.class
+br\com\blockfilmes\controller\LoginController.class
+br\com\blockfilmes\blockfilmes\Main.class
+br\com\blockfilmes\controller\CatalogoFilmesController$1.class
+br\com\blockfilmes\model\Filme.class
