@@ -6,10 +6,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="450.0" spacing="15.0" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.blockfilmes.controller.CadastroUsuarioController">
+<VBox alignment="CENTER" prefHeight="650.0" prefWidth="450.0" spacing="15.0" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.blockfilmes.controller.CadastroUsuarioController">
     <stylesheets>
         <URL value="@../styles/style.css" />
     </stylesheets>
@@ -51,9 +53,19 @@
             </children>
         </VBox>
 
-        <VBox maxWidth="320.0" spacing="5.0">
+        <VBox alignment="CENTER" maxWidth="320.0" spacing="5.0">
             <children>
-                <Label text="Foto de Perfil" />
+                <Label text="Foto de Perfil" maxWidth="320.0" alignment="CENTER_LEFT" />
+                
+                <ImageView fx:id="imgPreviewCadastro" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 8, 0, 0, 0);">
+                    <image>
+                        <Image url="https://www.w3schools.com/howto/img_avatar.png" />
+                    </image>
+                    <VBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                    </VBox.margin>
+                </ImageView>
+
                 <Button fx:id="btnSelecionarFoto" maxWidth="320.0" mnemonicParsing="false" onAction="#handleSelecionarFoto" prefHeight="35.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-border-color: #8C8C8C; -fx-border-radius: 4px;" text="Selecionar Imagem..." />
                 <Label fx:id="lblNomeFoto" text="Nenhuma foto selecionada" textFill="#8c8c8c">
                     <font>

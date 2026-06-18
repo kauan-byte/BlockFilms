@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,6 +26,7 @@ public class EditarUsuarioController implements Initializable {
     @FXML private Button btnAlterarFoto;
     @FXML private TextField txtNome;
     @FXML private TextField txtEmail;
+    @FXML private PasswordField txtSenha; // Novo campo injetado do FXML
     @FXML private Button btnSalvar;
     @FXML private Button btnVoltar;
     @FXML private Label lblMensagem;
@@ -36,9 +38,7 @@ public class EditarUsuarioController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.back4AppService = new Back4AppService();
-        // Coloca uma imagem avatar padrão provisória de fallback
         imgPerfil.setImage(new Image("https://www.w3schools.com/howto/img_avatar.png", true));
-        
         carregarDadosPerfil();
     }    
 
@@ -88,34 +88,44 @@ public class EditarUsuarioController implements Initializable {
     @FXML
     private void handleSalvarPerfil(ActionEvent event) {
         String novoNome = txtNome.getText().trim();
+        String novoEmail = txtEmail.getText().trim();
+        String novaSenha = txtSenha.getText().trim();
         String token = SessaoUsuario.getSessionToken();
         String id = SessaoUsuario.getObjectId();
 
-        if (novoNome.isEmpty()) {
-            lblMensagem.setText("O nome não pode ficar vazio.");
+        if (novoNome.isEmpty() || novoEmail.isEmpty()) {
+            lblMensagem.setStyle("-fx-text-fill: #E50914;");
+            lblMensagem.setText("Nome e E-mail não podem ficar vazios.");
             return;
         }
 
+        lblMensagem.setStyle("-fx-text-fill: #FFFFFF;");
         lblMensagem.setText("Salvando alterações...");
 
         new Thread(() -> {
             try {
                 String urlNovaFoto = urlFotoAtual;
 
-                // CORREÇÃO: Enviando o token exigido pela assinatura do método
                 if (arquivoFotoSelecionada != null) {
                     urlNovaFoto = back4AppService.uploadImagemPerfil(arquivoFotoSelecionada, token);
                 }
 
                 JsonObject dados = new JsonObject();
                 dados.addProperty("username", novoNome);
+                dados.addProperty("email", novoEmail);
                 dados.addProperty("fotoPerfilUrl", urlNovaFoto);
+                
+                // Se o usuário digitou algo no campo senha, atualiza ela também
+                if (!novaSenha.isEmpty()) {
+                    dados.addProperty("password", novaSenha);
+                }
 
                 back4AppService.atualizarUsuario(id, token, dados);
 
                 Platform.runLater(() -> {
                     lblMensagem.setStyle("-fx-text-fill: #00FF00;");
-                    lblMensagem.setText("Perfil updated successfully!");
+                    lblMensagem.setText("Perfil atualizado com sucesso!");
+                    txtSenha.clear(); // Limpa o campo de senha após salvar
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {

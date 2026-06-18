@@ -8,8 +8,8 @@ import java.nio.file.Files;
 public class Back4AppService {
 
     private static final String BASE_URL = "https://parseapi.back4app.com";
-    private static final String APP_ID = "8v9C8AglW97S7FkP3p7uO5Q4v0vXyP8r0H6I6B8s"; 
-    private static final String REST_API_KEY = "fRshL0T5C8F8tP8P7p5Q4v0vXyP8r0H6I6B8s7Fk"; 
+    private static final String APP_ID = "QVDmGGbnR0V4SK7GEJVhNfE5xMvsBlPKL10YEkoe";
+    private static final String REST_API_KEY = "VzSQNh3y5Patgl6Lm0XPxiZnuLIYUxRdTHj3pBuU";
 
     private final java.net.http.HttpClient client;
     private final Gson gson;
@@ -22,7 +22,7 @@ public class Back4AppService {
     // 1. Login
     public JsonObject login(String username, String password) throws Exception {
         String url = BASE_URL + "/login?username=" + java.net.URLEncoder.encode(username, "UTF-8")
-                   + "&password=" + java.net.URLEncoder.encode(password, "UTF-8");
+                + "&password=" + java.net.URLEncoder.encode(password, "UTF-8");
 
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(url))
@@ -53,14 +53,15 @@ public class Back4AppService {
         return gson.fromJson(response.body(), JsonObject.class);
     }
 
-    // 3. Cadastrar Filme
-    public JsonObject cadastrarFilme(String titulo, String categoria, String classificacao, String sinopse, String fotoFilmeUrl) throws Exception {
+    // 3. Cadastrar Filme (ATUALIZADO COM ANO)
+    public JsonObject cadastrarFilme(String titulo, String categoria, String classificacao, String sinopse, String fotoFilmeUrl, String ano) throws Exception {
         JsonObject dados = new JsonObject();
         dados.addProperty("titulo", titulo);
         dados.addProperty("categoria", categoria);
         dados.addProperty("classificacao", classificacao);
         dados.addProperty("sinopse", sinopse);
         dados.addProperty("fotoFilmeUrl", fotoFilmeUrl);
+        dados.addProperty("ano", ano); // Adiciona o ano no banco
 
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(BASE_URL + "/classes/Filme"))
@@ -121,9 +122,33 @@ public class Back4AppService {
         return jsonFake;
     }
 
-    // 5c. Método exclusivo para a tela de Editar Perfil (Retorna String direta)
+    // 5b. MÉTODO EXCLUSIVO PARA O PERFIL (Agora autenticado com Session Token!)
     public String uploadImagemPerfil(File arquivo, String sessionToken) throws Exception {
-        return executarUpload(arquivo);
+        String nomeArquivo = arquivo.getName();
+        byte[] dadosArquivo = Files.readAllBytes(arquivo.toPath());
+        String contentType = Files.probeContentType(arquivo.toPath());
+
+        if (contentType == null) {
+            contentType = "image/jpeg";
+        }
+
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(BASE_URL + "/files/" + nomeArquivo))
+                .header("X-Parse-Application-Id", APP_ID)
+                .header("X-Parse-REST-API-Key", REST_API_KEY)
+                .header("X-Parse-Session-Token", sessionToken) // <--- ISSO PROVA QUE VOCÊ ESTÁ LOGADO!
+                .header("Content-Type", contentType)
+                .POST(java.net.http.HttpRequest.BodyPublishers.ofByteArray(dadosArquivo))
+                .build();
+
+        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 201 || response.statusCode() == 200) {
+            JsonObject json = gson.fromJson(response.body(), JsonObject.class);
+            return json.get("url").getAsString();
+        } else {
+            throw new Exception("Erro no upload de perfil autenticado: " + response.body());
+        }
     }
 
     // Motor interno de upload compartilhado por todos os métodos acima
