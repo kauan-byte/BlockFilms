@@ -3,23 +3,23 @@ package br.com.blockfilmes.model;
 public class Filme {
     private String objectId;
     private String titulo;
-    private String categoria; // Ação, Comédia, Terror, Ficção Científica, Drama, Mistério
-    private String classificacao; // Livre, 10, 12, 14, 16, 18
+    private String categoria; 
+    private String classificacao; 
     private String sinopse;
     private String fotoFilmeUrl;
+    private String ano; // Novo atributo adicionado
 
-    // Construtor vazio
     public Filme() {}
 
-    public Filme(String titulo, String categoria, String classificacao, String sinopse, String fotoFilmeUrl) {
+    public Filme(String titulo, String categoria, String classificacao, String sinopse, String fotoFilmeUrl, String ano) {
         this.titulo = titulo;
         this.categoria = categoria;
         this.classificacao = classificacao;
         this.sinopse = sinopse;
         this.fotoFilmeUrl = fotoFilmeUrl;
+        this.ano = ano;
     }
 
-    // Getters e Setters
     public String getObjectId() { return objectId; }
     public void setObjectId(String objectId) { this.objectId = objectId; }
 
@@ -37,4 +37,7 @@ public class Filme {
 
     public String getFotoFilmeUrl() { return fotoFilmeUrl; }
     public void setFotoFilmeUrl(String fotoFilmeUrl) { this.fotoFilmeUrl = fotoFilmeUrl; }
+
+    public String getAno() { return ano; }
+    public void setAno(String ano) { this.ano = ano; }
 }

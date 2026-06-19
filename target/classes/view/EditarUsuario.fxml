@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="650.0" prefWidth="500.0" spacing="15.0" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.blockfilmes.controller.EditarUsuarioController">
+<VBox alignment="CENTER" prefHeight="680.0" prefWidth="500.0" spacing="15.0" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.blockfilmes.controller.EditarUsuarioController">
     <stylesheets>
         <URL value="@../styles/style.css" />
     </stylesheets>
@@ -54,6 +54,12 @@
 
         <Button fx:id="btnSalvar" maxWidth="350.0" mnemonicParsing="false" onAction="#handleSalvarPerfil" prefHeight="40.0" styleClass="button-primary" text="Salvar Alterações" />
         <Button fx:id="btnVoltar" mnemonicParsing="false" onAction="#handleVoltar" styleClass="button-hyperlink" text="Voltar para o Catálogo" />
+        
+        <Button fx:id="btnExcluirConta" maxWidth="350.0" mnemonicParsing="false" onAction="#handleExcluirConta" prefHeight="35.0" style="-fx-background-color: #e50914; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 4;" text="Excluir Minha Conta ⚠️">
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+        </Button>
         
         <Label fx:id="lblMensagem" textFill="#e50914" wrapText="true" />
     </children>

@@ -126,3 +126,20 @@
     -fx-alignment: CENTER-LEFT;
     -fx-padding: 10px;
 }
+
+/* Remove o fundo branco das células vazias e define a cor escura na ListView */
+.list-view {
+    -fx-background-color: #222222;
+}
+
+.list-view .list-cell {
+    -fx-background-color: #222222;
+    -fx-text-fill: white;
+}
+
+/* Garante que as células vazias fiquem totalmente transparentes ou escuras */
+.list-view .list-cell:empty {
+    -fx-background-color: #222222;
+    -fx-border-color: transparent;
+}
+

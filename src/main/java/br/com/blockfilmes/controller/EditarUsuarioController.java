@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -19,6 +20,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.control.ButtonType;
 
 public class EditarUsuarioController implements Initializable {
 
@@ -26,10 +28,11 @@ public class EditarUsuarioController implements Initializable {
     @FXML private Button btnAlterarFoto;
     @FXML private TextField txtNome;
     @FXML private TextField txtEmail;
-    @FXML private PasswordField txtSenha; // Novo campo injetado do FXML
+    @FXML private PasswordField txtSenha;
     @FXML private Button btnSalvar;
     @FXML private Button btnVoltar;
     @FXML private Label lblMensagem;
+    @FXML private Button btnExcluirConta;
 
     private Back4AppService back4AppService;
     private File arquivoFotoSelecionada;
@@ -115,7 +118,6 @@ public class EditarUsuarioController implements Initializable {
                 dados.addProperty("email", novoEmail);
                 dados.addProperty("fotoPerfilUrl", urlNovaFoto);
                 
-                // Se o usuário digitou algo no campo senha, atualiza ela também
                 if (!novaSenha.isEmpty()) {
                     dados.addProperty("password", novaSenha);
                 }
@@ -124,8 +126,8 @@ public class EditarUsuarioController implements Initializable {
 
                 Platform.runLater(() -> {
                     lblMensagem.setStyle("-fx-text-fill: #00FF00;");
-                    lblMensagem.setText("Perfil atualizado com sucesso!");
-                    txtSenha.clear(); // Limpa o campo de senha após salvar
+                    lblMensagem.setText("Perfil updated com sucesso!");
+                    txtSenha.clear();
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
@@ -141,5 +143,61 @@ public class EditarUsuarioController implements Initializable {
     private void handleVoltar(ActionEvent event) {
         Stage stage = (Stage) btnVoltar.getScene().getWindow();
         Navegacao.mudarTela(stage, "CatalogoFilmes.fxml", "BlockFilmes - Catálogo de Filmes");
+    }
+    
+    @FXML
+    private void handleExcluirConta(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Excluir Conta");
+        alert.setHeaderText("ESTA AÇÃO É IRREVERSÍVEL!");
+        alert.setContentText("Você perderá o acesso ao BlockFilmes e todos os seus dados serão apagados. Deseja continuar?");
+
+        alert.showAndWait().ifPresent(resposta -> {
+            if (resposta == ButtonType.OK) {
+                new Thread(() -> {
+                    try {
+                        // USO RECORRENTE DOS SEUS MÉTODOS EXISTENTES NA SESSÃO
+                        String objectId = SessaoUsuario.getObjectId();
+                        String sessionToken = SessaoUsuario.getSessionToken();
+
+                        boolean deletado = back4AppService.excluirUsuario(objectId, sessionToken);
+
+                        if (deletado) {
+                            System.out.println("Conta excluída com sucesso do banco de dados.");
+
+                            // LIMPEZA DA SESSÃO ADAPTADA AO SEU DESIGN ATUAL
+                            SessaoUsuario.setSessionToken(null);
+                            SessaoUsuario.setObjectId(null);
+
+                            Platform.runLater(() -> {
+                                Stage stage = (Stage) btnExcluirConta.getScene().getWindow();
+                                Navegacao.mudarTela(stage, "login.fxml", "BlockFilmes - Login");
+                                
+                                Alert info = new Alert(Alert.AlertType.INFORMATION);
+                                info.setTitle("Conta Removida");
+                                info.setHeaderText(null);
+                                info.setContentText("Sua conta foi permanentemente removida do sistema.");
+                                info.showAndWait();
+                            });
+                        } else {
+                            mostrarErro("Não foi possível excluir a conta. Tente novamente mais tarde.");
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        mostrarErro("Erro ao conectar com o servidor: " + e.getMessage());
+                    }
+                }).start();
+            }
+        });
+    }
+
+    private void mostrarErro(String msg) {
+        Platform.runLater(() -> {
+            Alert alertErro = new Alert(Alert.AlertType.ERROR);
+            alertErro.setTitle("Erro");
+            alertErro.setContentText(msg);
+            alertErro.showAndWait();
+        });
     }
 }

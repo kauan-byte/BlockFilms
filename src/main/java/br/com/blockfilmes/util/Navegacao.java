@@ -22,7 +22,7 @@ public class Navegacao {
             Parent root = loader.load();
             
             // Define a nova cena mantendo o tamanho ou aplicando um padrão
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 1000, 700);
             stage.setScene(scene);
             stage.setTitle(titulo);
             stage.centerOnScreen(); // Centraliza a nova janela na tela do PC
