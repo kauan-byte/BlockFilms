@@ -75,3 +75,49 @@ graph TD
     CU4 ===> BD
     CU5 ===> BD
     CU6 ===> BD
+
+classDiagram
+    %% Classe Base de Usuário
+    class Usuario {
+        +String objectId
+        +String username
+        +String email
+        +String password
+        +String telefone
+        +String fotoPerfilUrl
+        +cadastrarUsuario() JsonObject
+        +login() JsonObject
+        +buscarUsuarioAtual() JsonObject
+        +atualizarUsuario() void
+        +excluirUsuario() boolean
+    }
+
+    %% Classe Filme
+    class Filme {
+        +String objectId
+        +String titulo
+        +String categoria
+        +String classificacao
+        +String sinopse
+        +String fotoFilmeUrl
+        +String ano
+        +listarFilmes() JsonObject
+        +cadastrarFilme() JsonObject
+        +atualizarFilme() JsonObject
+        +excluirFilme() boolean
+    }
+
+    %% Classe Avaliacao (Tabela 'avaliacoes')
+    class Avaliacao {
+        +String objectId
+        +String nome_filme
+        +int nota
+        +String comentario
+        +Pointer usuario_
+        +buscarAvaliacoesPorFilmeSimulado() JsonObject
+        +salvarAvaliacao() JsonObject
+    }
+
+    %% Relacionamentos Formais da UML
+    Avaliacao "0..*" --> "1" Usuario : vincula_a (usuario_)
+    Avaliacao "0..*" --> "1" Filme : avalia
