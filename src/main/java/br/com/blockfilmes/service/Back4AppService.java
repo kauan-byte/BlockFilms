@@ -246,7 +246,6 @@ public class Back4AppService {
         }
     }
 
-    // 8. Buscar Avaliações dinamicamente por qualquer Filme utilizando a coluna 'titulo'
     public JsonObject buscarAvaliacoesPorFilmeSimulado(String nomeFilme) throws Exception {
         if (nomeFilme != null) {
             nomeFilme = nomeFilme.trim();
@@ -254,12 +253,12 @@ public class Back4AppService {
 
         System.out.println("\n[DEBUG] Filtrando avaliações para o filme: \"" + nomeFilme + "\"");
 
-        // Utiliza o campo correto 'titulo' mapeado dinamicamente para o filme selecionado
-        String filtroJson = "{\"titulo\":\"" + nomeFilme + "\"}";
+        String filtroJson = "{\"nome_filme\":\"" + nomeFilme + "\"}";
 
-        String url = BASE_URL + "/classes/Avaliacoes?where="
+        // Tenta incluir as duas possibilidades para forçar o Parse a trazer o objeto do usuário completo
+        String url = BASE_URL + "/classes/avaliacoes?where="
                 + java.net.URLEncoder.encode(filtroJson, "UTF-8")
-                + "&include=usuario";
+                + "&include=usuario&include=usuario_";
 
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(url))
@@ -271,34 +270,18 @@ public class Back4AppService {
         java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
 
         System.out.println("[DEBUG] Código de Status HTTP: " + response.statusCode());
-        System.out.println("[DEBUG] Resposta Bruta do Banco: " + response.body() + "\n");
+        System.out.println("[DEBUG] Resposta Bruta do Banco: " + response.body());
 
         if (response.statusCode() == 200) {
             return gson.fromJson(response.body(), JsonObject.class);
         } else {
-            // Fallback para tabela com 'a' minúsculo se necessário
-            if (response.statusCode() == 404) {
-                String urlMinusc = BASE_URL + "/classes/avaliacoes?where="
-                        + java.net.URLEncoder.encode(filtroJson, "UTF-8")
-                        + "&include=usuario";
-                
-                request = java.net.http.HttpRequest.newBuilder()
-                        .uri(java.net.URI.create(urlMinusc))
-                        .header("X-Parse-Application-Id", APP_ID)
-                        .header("X-Parse-REST-API-Key", REST_API_KEY)
-                        .GET()
-                        .build();
-                response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    return gson.fromJson(response.body(), JsonObject.class);
-                }
-            }
             throw new Exception("Erro ao buscar avaliações do Back4App: " + response.body());
         }
     }
 
+    // 9. Excluir Usuário
     public boolean excluirUsuario(String objectId, String sessionToken) throws Exception {
-        String url = "https://parseapi.back4app.com/users/" + objectId;
+        String url = BASE_URL + "/users/" + objectId;
 
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
@@ -313,6 +296,7 @@ public class Back4AppService {
         return response.statusCode() == 200;
     }
 
+    // 10. Excluir Filme
     public boolean excluirFilme(String objectId) throws Exception {
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(BASE_URL + "/classes/Filme/" + objectId))

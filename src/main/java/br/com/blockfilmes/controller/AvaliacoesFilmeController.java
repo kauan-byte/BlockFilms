@@ -79,8 +79,10 @@ public class AvaliacoesFilmeController implements Initializable {
                     setGraphic(null);
                 } else {
                     String usuario = "Anônimo";
-                    if (avaliacao.has("usuario") && !avaliacao.get("usuario").isJsonNull()) {
-                        JsonElement userElement = avaliacao.get("usuario");
+                    
+                    // CORREÇÃO: Alterado de "usuario" para "usuario_" para bater com o banco de dados
+                    if (avaliacao.has("usuario_") && !avaliacao.get("usuario_").isJsonNull()) {
+                        JsonElement userElement = avaliacao.get("usuario_");
                         
                         if (userElement.isJsonObject()) {
                             JsonObject userObj = userElement.getAsJsonObject();
