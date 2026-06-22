@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avaliar Filme - Block Films</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">Block Films</a>
+        <nav class="nav-links">
+          <a href="index.html">Avaliações</a>
+          <a href="perfil.html">Meu Perfil</a>
+        </nav>
+        <div class="user-actions" id="user-actions"></div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="auth-panel">
+        <div class="profile-header">
+          <div>
+            <h2>Avaliar Filme</h2>
+            <p class="form-message info">
+              Campos da tabela <strong>avaliacoes</strong>: nome_filme, nota (0–10), comentario.
+            </p>
+          </div>
+        </div>
+
+        <form class="auth-form" id="reviewForm" enctype="multipart/form-data">
+          <div class="input-group">
+            <label for="nome_filme">Nome do filme</label>
+            <input
+              id="nome_filme"
+              type="text"
+              name="nome_filme"
+              placeholder="Nome do filme"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="nota">Nota (0 a 10)</label>
+            <input
+              id="nota"
+              type="number"
+              name="nota"
+              placeholder="9"
+              min="0"
+              max="10"
+              step="1"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="linkImagem">URL da capa (opcional)</label>
+            <input id="linkImagem" type="url" name="linkImagem" placeholder="https://..." />
+          </div>
+          <div class="input-group">
+            <label for="imagem">Upload de capa (opcional)</label>
+            <input id="imagem" type="file" name="imagem" accept="image/*" />
+          </div>
+          <div class="input-group">
+            <label for="comentario">Comentário</label>
+            <textarea
+              id="comentario"
+              name="comentario"
+              placeholder="Escreva sua opinião sobre o filme"
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Enviar avaliação</button>
+          <p id="message" class="form-message"></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="js/main.js" defer></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const user = await loadHeader();
+        if (!user) {
+          const returnTo = encodeURIComponent(
+            window.location.pathname + window.location.search,
+          );
+          window.location.href = `login.html?return=${returnTo}`;
+          return;
+        }
+
+        const nomeParam = getQueryParam("nome") || getQueryParam("titulo");
+        if (nomeParam) document.getElementById("nome_filme").value = nomeParam;
+
+        const form = document.getElementById("reviewForm");
+        const message = document.getElementById("message");
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          message.textContent = "";
+
+          try {
+            await submitReview(form);
+            const nome = form.nome_filme.value.trim();
+            showMessage(message, "Avaliação enviada! Redirecionando...", "success");
+            setTimeout(
+              () => (window.location.href = `filme.html?nome=${encodeURIComponent(nome)}`),
+              800,
+            );
+          } catch (error) {
+            showMessage(message, error.message, "error");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
