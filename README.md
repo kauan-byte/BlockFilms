@@ -8,34 +8,70 @@ O **BlockFilmes** é um sistema completo de catálogo e avaliação de filmes, d
 
 O projeto foi unificado em um único repositório para demonstrar a integração entre plataformas:
 
-*   **Painel Desktop (JavaFX):** Desenvolvido por **[Seu Nome Aqui]**. É a área administrativa do sistema, permitindo o cadastro de novos filmes, gerenciamento de dados e monitoramento de todas as avaliações enviadas pelos usuários.
-*   **Portal Web (JavaScript/HTML/CSS):** Desenvolvido por **[Nome do Seu Amigo Aqui]**. É a interface voltada ao cliente final, onde os usuários navegam pelo catálogo de filmes, visualizam detalhes e registram suas notas e comentários.
+* **Painel Desktop (JavaFX):** Desenvolvido por **[Seu Nome Aqui]**. É a área administrativa do sistema, permitindo o cadastro de novos filmes, gerenciamento de dados e monitoramento de todas as avaliações enviadas pelos usuários.
+* **Portal Web (JavaScript/HTML/CSS):** Desenvolvido por **[Nome do Seu Amigo Aqui]**. É a interface voltada ao cliente final, onde os usuários navegam pelo catálogo de filmes, visualizam detalhes e registram suas notas e comentários.
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## 📊 Diagramas de Arquitetura (UML)
 
-### Backend & Banco de Dados
-*   **Back4App (Parse API):** Persistência de dados em nuvem, autenticação de usuários e relacionamentos através de Pointers.
+### 1. Diagrama de Casos de Uso (Fronteira do Sistema)
+Este diagrama representa os limites do sistema (campo quadrado), as funcionalidades internas por plataforma e as interações do Usuário dependendo de qual ambiente ele está operando.
 
-### Módulo Desktop (Java)
-*   **Java 17 / JavaFX 21**
-*   **Maven** (Gerenciamento de dependências)
-*   **Gson** (Parseamento de JSON)
+```mermaid
+graph TD
+    %% Definição Visual dos Atores (Fora da Caixa)
+    UserWeb["👤 USUÁRIO WEB<br>(Cliente / Navegador)"]
+    UserDesk["💻 USUÁRIO DESKTOP<br>(Gerência / Java)"]
 
-### Módulo Web
-*   **HTML5 / CSS3 / JavaScript (ES6)**
-*   **Fetch API** (Integração com o Back4App)
+    style UserWeb fill:#222,stroke:#fff,stroke-width:2px,color:#fff
+    style UserDesk fill:#222,stroke:#fff,stroke-width:2px,color:#fff
 
----
+    %% O CAMPO QUADRADO (Fronteira do Sistema)
+    subgraph Caixa_Sistema [FRONTEIRA DO SISTEMA: BLOCKFILMES]
+        style Caixa_Sistema fill:#111,stroke:#e50914,stroke-width:3px,color:#fff
+        
+        %% Funcionalidade de Acesso
+        CU_Login([Fazer Login / Criar Conta])
+        
+        %% Escopo de Telas da Web
+        subgraph Modulo_Web [Plataforma Web]
+            style Modulo_Web fill:#222,stroke:#333
+            CU1([Navegar pelo Catálogo])
+            CU2([Visualizar Detalhes do Filme])
+            CU3([Enviar Nota e Comentário])
+        end
 
-## 📦 Como Executar os Projetos
+        %% Escopo de Telas do Java Desktop
+        subgraph Modulo_Desktop [Plataforma Desktop]
+            style Modulo_Desktop fill:#222,stroke:#333
+            CU4([Cadastrar Novo Filme])
+            CU5([Atualizar Dados do Filme])
+            CU6([Excluir Filme do Catálogo])
+            CU7([Monitorar Avaliações])
+        end
+    end
 
-### 1. Executando o Painel Desktop (Java)
-1. Certifique-se de ter o **JDK 17+** instalado.
-2. Abra o projeto na sua IDE (NetBeans).
-3. Aguarde o Maven baixar as dependências.
-4. Execute o projeto pressionando **F6** ou limpando e construindo antes.
+    %% Banco de Dados (Fora da Caixa)
+    BD[("☁️ Nuvem Back4App<br>(Banco de Dados)")]
+    style BD fill:#1f1f1f,stroke:#007acc,stroke-width:2px
 
-### 2. Executando o Portal Web
-1. Abra os arquivos da pasta Web em qualquer navegador moderno clicando duas vezes no arquivo `index.html`.
+    %% Setas de Interação da Web
+    UserWeb --> CU_Login
+    UserWeb --> CU1
+    UserWeb --> CU2
+    UserWeb --> CU3
+
+    %% Setas de Interação do Desktop
+    UserDesk --> CU_Login
+    UserDesk --> CU4
+    UserDesk --> CU5
+    UserDesk --> CU6
+    UserDesk --> CU7
+
+    %% Fluxo de Persistência no Banco de Dados
+    CU_Login ===> BD
+    CU3 ===> BD
+    CU4 ===> BD
+    CU5 ===> BD
+    CU6 ===> BD
