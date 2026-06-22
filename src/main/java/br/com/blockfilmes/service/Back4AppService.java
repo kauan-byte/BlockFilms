@@ -12,8 +12,8 @@ import java.net.http.HttpResponse;
 public class Back4AppService {
 
     private static final String BASE_URL = "https://parseapi.back4app.com";
-    private static final String APP_ID = "QVDmGGbnR0V4SK7GEJVhNfE5xMvsBlPKL10YEkoe";
-    private static final String REST_API_KEY = "VzSQNh3y5Patgl6Lm0XPxiZnuLIYUxRdTHj3pBuU";
+    private static final String APP_ID = "lLR2VMbmrO3GSbV7mikrOGuMygO4ezzbOuzdT9m9";
+    private static final String REST_API_KEY = "7d9oHqJmvdWFooTHC2TycioMQ3FegkN1wsNmoowL";
 
     private final java.net.http.HttpClient client;
     private final Gson gson;
@@ -57,7 +57,7 @@ public class Back4AppService {
         return gson.fromJson(response.body(), JsonObject.class);
     }
 
-    // 3. Cadastrar Filme (ATUALIZADO COM ANO)
+    // 3. Cadastrar Filme
     public JsonObject cadastrarFilme(String titulo, String categoria, String classificacao, String sinopse, String fotoFilmeUrl, String ano) throws Exception {
         JsonObject dados = new JsonObject();
         dados.addProperty("titulo", titulo);
@@ -65,7 +65,7 @@ public class Back4AppService {
         dados.addProperty("classificacao", classificacao);
         dados.addProperty("sinopse", sinopse);
         dados.addProperty("fotoFilmeUrl", fotoFilmeUrl);
-        dados.addProperty("ano", ano); // Adiciona o ano no banco
+        dados.addProperty("ano", ano);
 
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(BASE_URL + "/classes/Filme"))
@@ -84,7 +84,7 @@ public class Back4AppService {
         }
     }
 
-    // NOVO MÉTODO 3b. Atualizar Filme Existente (O que estava faltando!)
+    // 3b. Atualizar Filme Existente
     public JsonObject atualizarFilme(String objectId, String titulo, String categoria, String classificacao, String sinopse, String fotoFilmeUrl, String ano) throws Exception {
         JsonObject dados = new JsonObject();
         dados.addProperty("titulo", titulo);
@@ -92,14 +92,14 @@ public class Back4AppService {
         dados.addProperty("classificacao", classificacao);
         dados.addProperty("sinopse", sinopse);
         dados.addProperty("fotoFilmeUrl", fotoFilmeUrl);
-        dados.addProperty("ano", ano); // Sincroniza a alteração do ano no banco
+        dados.addProperty("ano", ano);
 
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(BASE_URL + "/classes/Filme/" + objectId))
                 .header("X-Parse-Application-Id", APP_ID)
                 .header("X-Parse-REST-API-Key", REST_API_KEY)
                 .header("Content-Type", "application/json")
-                .PUT(java.net.http.HttpRequest.BodyPublishers.ofString(gson.toJson(dados))) // Requisição PUT para editar
+                .PUT(java.net.http.HttpRequest.BodyPublishers.ofString(gson.toJson(dados)))
                 .build();
 
         java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
@@ -147,17 +147,13 @@ public class Back4AppService {
 
     // 5b. Método de Upload que aceita Arquivo E uma String
     public JsonObject uploadImagem(File arquivo, String parametroAdicional) throws Exception {
-        String urlString = executingUpload(arquivo);
+        String urlString = executarUpload(arquivo);
         JsonObject jsonFake = new JsonObject();
         jsonFake.addProperty("url", urlString);
         return jsonFake;
     }
 
-    private String executingUpload(File arquivo) throws Exception {
-         return executarUpload(arquivo);
-    }
-
-    // 5b. MÉTODO EXCLUSIVO PARA O PERFIL
+    // 5c. MÉTODO EXCLUSIVO PARA O PERFIL
     public String uploadImagemPerfil(File arquivo, String sessionToken) throws Exception {
         String nomeArquivo = arquivo.getName();
         byte[] dadosArquivo = Files.readAllBytes(arquivo.toPath());
@@ -186,7 +182,6 @@ public class Back4AppService {
         }
     }
 
-    // Motor interno de upload compartilhado por todos os métodos acima
     private String executarUpload(File arquivo) throws Exception {
         String nomeArquivo = arquivo.getName();
         byte[] dadosArquivo = Files.readAllBytes(arquivo.toPath());
@@ -250,40 +245,63 @@ public class Back4AppService {
             throw new Exception("Erro ao atualizar usuário: " + response.body());
         }
     }
-    
-    // Método temporário para simular as avaliações
-    public JsonObject buscarAvaliacoesPorFilmeSimulado(String idFilme) {
-        JsonObject respostaFake = new JsonObject();
-        com.google.gson.JsonArray listaComentarios = new com.google.gson.JsonArray();
 
-        JsonObject c1 = new JsonObject();
-        c1.addProperty("nomeUsuario", "Gabriel Silva (Web)");
-        c1.addProperty("nota", 5);
-        c1.addProperty("comentario", "Filme espetacular! Uma obra-prima da ficção científica.");
-        
-        JsonObject c2 = new JsonObject();
-        c2.addProperty("nomeUsuario", "Amanda Souza (Mobile)");
-        c2.addProperty("nota", 4);
-        c2.addProperty("comentario", "Muito bom, mas achei o final um pouco confuso.");
+    // 8. Buscar Avaliações dinamicamente por qualquer Filme utilizando a coluna 'titulo'
+    public JsonObject buscarAvaliacoesPorFilmeSimulado(String nomeFilme) throws Exception {
+        if (nomeFilme != null) {
+            nomeFilme = nomeFilme.trim();
+        }
 
-        JsonObject c3 = new JsonObject();
-        c3.addProperty("nomeUsuario", "Lucas Ramos (Web)");
-        c3.addProperty("nota", 2);
-        c3.addProperty("comentario", "Não gostei muito. Ritmo muito lento.");
+        System.out.println("\n[DEBUG] Filtrando avaliações para o filme: \"" + nomeFilme + "\"");
 
-        listaComentarios.add(c1);
-        listaComentarios.add(c2);
-        listaComentarios.add(c3);
+        // Utiliza o campo correto 'titulo' mapeado dinamicamente para o filme selecionado
+        String filtroJson = "{\"titulo\":\"" + nomeFilme + "\"}";
 
-        respostaFake.add("results", listaComentarios);
-        return respostaFake;
+        String url = BASE_URL + "/classes/Avaliacoes?where="
+                + java.net.URLEncoder.encode(filtroJson, "UTF-8")
+                + "&include=usuario";
+
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(url))
+                .header("X-Parse-Application-Id", APP_ID)
+                .header("X-Parse-REST-API-Key", REST_API_KEY)
+                .GET()
+                .build();
+
+        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("[DEBUG] Código de Status HTTP: " + response.statusCode());
+        System.out.println("[DEBUG] Resposta Bruta do Banco: " + response.body() + "\n");
+
+        if (response.statusCode() == 200) {
+            return gson.fromJson(response.body(), JsonObject.class);
+        } else {
+            // Fallback para tabela com 'a' minúsculo se necessário
+            if (response.statusCode() == 404) {
+                String urlMinusc = BASE_URL + "/classes/avaliacoes?where="
+                        + java.net.URLEncoder.encode(filtroJson, "UTF-8")
+                        + "&include=usuario";
+                
+                request = java.net.http.HttpRequest.newBuilder()
+                        .uri(java.net.URI.create(urlMinusc))
+                        .header("X-Parse-Application-Id", APP_ID)
+                        .header("X-Parse-REST-API-Key", REST_API_KEY)
+                        .GET()
+                        .build();
+                response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 200) {
+                    return gson.fromJson(response.body(), JsonObject.class);
+                }
+            }
+            throw new Exception("Erro ao buscar avaliações do Back4App: " + response.body());
+        }
     }
 
     public boolean excluirUsuario(String objectId, String sessionToken) throws Exception {
         String url = "https://parseapi.back4app.com/users/" + objectId;
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("X-Parse-Application-Id", APP_ID)
                 .header("X-Parse-REST-API-Key", REST_API_KEY)
@@ -291,22 +309,19 @@ public class Back4AppService {
                 .DELETE()
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         return response.statusCode() == 200;
     }
-    
-    // Novo método para deletar o filme do banco de dados
-public boolean excluirFilme(String objectId) throws Exception {
-    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-            .uri(java.net.URI.create(BASE_URL + "/classes/Filme/" + objectId))
-            .header("X-Parse-Application-Id", APP_ID)
-            .header("X-Parse-REST-API-Key", REST_API_KEY)
-            .DELETE() // Requisição HTTP DELETE
-            .build();
 
-    java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+    public boolean excluirFilme(String objectId) throws Exception {
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(BASE_URL + "/classes/Filme/" + objectId))
+                .header("X-Parse-Application-Id", APP_ID)
+                .header("X-Parse-REST-API-Key", REST_API_KEY)
+                .DELETE()
+                .build();
 
-    // O Back4App retorna status 200 OK quando o objeto é deletado com sucesso
-    return response.statusCode() == 200;
-}
+        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+        return response.statusCode() == 200;
+    }
 }

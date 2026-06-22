@@ -23,9 +23,12 @@ import javafx.stage.Stage;
 
 public class AvaliacoesFilmeController implements Initializable {
 
-    @FXML private Label lblNomeFilme;
-    @FXML private ListView<JsonObject> listViewAvaliacoes;
-    @FXML private Button btnVoltar;
+    @FXML
+    private Label lblNomeFilme;
+    @FXML
+    private ListView<JsonObject> listViewAvaliacoes;
+    @FXML
+    private Button btnVoltar;
 
     private Back4AppService back4AppService;
     private ObservableList<JsonObject> listaComentarios = FXCollections.observableArrayList();
@@ -34,28 +37,22 @@ public class AvaliacoesFilmeController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.back4AppService = new Back4AppService();
 
-        // 1. Recupera o filme que foi selecionado na tela de Catálogo
         Filme filmeSelecionado = SessaoUsuario.getFilmeSelecionado();
 
         if (filmeSelecionado != null) {
-            // Atualiza o texto do topo com o título do filme clicado
             lblNomeFilme.setText(filmeSelecionado.getTitulo());
-            
-            // Carrega os comentários fictícios
-            carregarAvaliacoesSimuladas(filmeSelecionado.getObjectId());
+            carregarAvaliacoesSimuladas(filmeSelecionado.getTitulo());
         } else {
             lblNomeFilme.setText("Nenhum filme selecionado.");
         }
 
-        // 2. Customiza a aparência das linhas da ListView
         configurarAparenciaDaLista();
     }
 
-    private void carregarAvaliacoesSimuladas(String idFilme) {
+    private void carregarAvaliacoesSimuladas(String nomeFilme) {
         try {
-            // Busca o JSON fake que criamos no Back4AppService
-            JsonObject resultado = back4AppService.buscarAvaliacoesPorFilmeSimulado(idFilme);
-            
+            JsonObject resultado = back4AppService.buscarAvaliacoesPorFilmeSimulado(nomeFilme);
+
             if (resultado != null && resultado.has("results")) {
                 JsonArray array = resultado.getAsJsonArray("results");
                 listaComentarios.clear();
@@ -67,7 +64,7 @@ public class AvaliacoesFilmeController implements Initializable {
                 listViewAvaliacoes.setItems(listaComentarios);
             }
         } catch (Exception e) {
-            System.err.println("Erro ao carregar avaliações simuladas: " + e.getMessage());
+            System.err.println("Erro ao carregar avaliações: " + e.getMessage());
         }
     }
 
@@ -81,25 +78,38 @@ public class AvaliacoesFilmeController implements Initializable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    // Extrai os dados do JSON simulado
-                    String usuario = avaliacao.has("nomeUsuario") ? avaliacao.get("nomeUsuario").getAsString() : "Anônimo";
+                    String usuario = "Anônimo";
+                    if (avaliacao.has("usuario") && !avaliacao.get("usuario").isJsonNull()) {
+                        JsonElement userElement = avaliacao.get("usuario");
+                        
+                        if (userElement.isJsonObject()) {
+                            JsonObject userObj = userElement.getAsJsonObject();
+                            
+                            if (userObj.has("username")) {
+                                usuario = userObj.get("username").getAsString();
+                            } else if (userObj.has("nome")) {
+                                usuario = userObj.get("nome").getAsString();
+                            } else if (userObj.has("objectId")) {
+                                usuario = userObj.get("objectId").getAsString();
+                            }
+                        } else {
+                            usuario = userElement.getAsString();
+                        }
+                    }
+
                     int nota = avaliacao.has("nota") ? avaliacao.get("nota").getAsInt() : 0;
                     String textoComentario = avaliacao.has("comentario") ? avaliacao.get("comentario").getAsString() : "";
 
-                    // Cria os Labels com estilizações básicas para o modo escuro
-                    Label lblUser = new Label(usuario);
+                    Label lblUser = new Label("Usuário: " + usuario);
                     lblUser.setStyle("-fx-font-weight: bold; -fx-text-fill: #e50914; -fx-font-size: 14px;");
 
-                    // Monta as estrelinhas ou número da nota
-                    String estrelas = "⭐".repeat(Math.max(0, Math.min(nota, 5)));
-                    Label lblNota = new Label("Nota: " + estrelas + " (" + nota + "/5)");
-                    lblNota.setStyle("-fx-text-fill: #ffc107; -fx-font-size: 12px;");
+                    Label lblNota = new Label("Nota: " + nota + " / 10  ⭐");
+                    lblNota.setStyle("-fx-text-fill: #ffc107; -fx-font-size: 13px; -fx-font-weight: bold;");
 
                     Label lblComentario = new Label(textoComentario);
                     lblComentario.setStyle("-fx-text-fill: white; -fx-font-size: 13px;");
-                    lblComentario.setWrapText(true); // Força o texto a quebrar linha se for muito longo
+                    lblComentario.setWrapText(true);
 
-                    // Organiza tudo verticalmente em um container invisível
                     VBox containerFila = new VBox(5, lblUser, lblNota, lblComentario);
                     containerFila.setPadding(new javafx.geometry.Insets(8));
                     containerFila.setStyle("-fx-background-color: #2b2b2b; -fx-background-radius: 4px;");
@@ -112,10 +122,7 @@ public class AvaliacoesFilmeController implements Initializable {
 
     @FXML
     private void handleVoltar(ActionEvent event) {
-        // CORRIGIDO: Agora usando o nome correto do método em português
-        SessaoUsuario.setFilmeSelecionado(null); 
-        
-        // Retorna para o Catálogo de Filmes
+        SessaoUsuario.setFilmeSelecionado(null);
         Stage stage = (Stage) btnVoltar.getScene().getWindow();
         Navegacao.mudarTela(stage, "CatalogoFilmes.fxml", "BlockFilmes - Catálogo de Filmes");
     }
